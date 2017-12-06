@@ -1,0 +1,75 @@
+<?php
+/**
+* @file
+* This module provides a node type called job post
+*/
+/**
+* Implements hook_node_info() to provide our job_post type.
+*/
+function job_post_node_info() {
+return array(
+'job_post' => array(
+'name' => t('Job Post'),
+'base' => 'job_post',
+'description' => t('Use this content type to post a job.'),
+'has_title' => TRUE,
+'title_label' => t('Job Title'),
+'help' => t('Enter the job title,
+job description, and the name of the company that posted the job'),
+),
+);
+}
+/**
+* Implements hook_permission().
+*/
+function job_post_permission() {
+return array(
+'create job post' => array(
+'title' => t('Create a job post'),
+'description' => t('Create a job post'),
+),
+'edit own job post' => array(
+'title' => t('Edit own job post'),
+'description' => t('Edit your own job posting'),
+),
+'edit any job post' => array(
+'title' => t('Edit any job post'),
+'description' => t('Edit any job posting'),
+),
+'delete own job post' => array(
+'title' => t('Delete own job post'),
+'description' => t('Delete own job posting'),
+),
+'delete any job post' => array(
+'title' => t('Delete any job post'),
+'description' => t('Delete any job posting'),
+),
+);
+}
+/**
+* Implements hook_node_access().
+*/
+function job_node_access($op, $node, $account) {
+$is_author = $account->uid == $node->uid;
+switch ($op) {
+case 'create':
+// Allow if user's role has 'create joke' permission.
+if (user_access('create job', $account)) {
+return NODE_ACCESS_ALLOW;
+}
+case 'update':
+// Allow if user's role has 'edit own joke' permission and user is
+// the author; or if the user's role has 'edit any joke' permission.
+if (user_access('edit own job', $account) && $is_author ||
+user_access('edit any job', $account)) {
+return NODE_ACCESS_ALLOW;
+}
+case 'delete':
+// Allow if user's role has 'delete own joke' permission and user is
+// the author; or if the user's role has 'delete any joke' permission.
+if (user_access('delete own job', $account) && $is_author ||
+user_access('delete any job', $account)) {
+return NODE_ACCESS_ALLOW;
+}
+}
+}
